@@ -1,0 +1,192 @@
+[gd_scene format=3 uid="uid://c5s84syh2f7y3"]
+
+[ext_resource type="Script" path="res://scripts/FishingSpot.gd" id="1_script"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.2, 0.5, 0.8, 1)
+sky_horizon_color = Color(0.5, 0.7, 0.9, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 2
+ambient_light_color = Color(0.6, 0.6, 0.6, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+size = Vector2(200, 200)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_water"]
+flat_shading = true
+albedo_color = Color(0.0470588, 0.435294, 0.709804, 1)
+roughness = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_boat"]
+size = Vector3(2.5, 0.4, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_boat"]
+flat_shading = true
+albedo_color = Color(0.364706, 0.219608, 0.12549, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bobber"]
+radius = 0.25
+height = 0.5
+radial_segments = 12
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bobber"]
+flat_shading = true
+albedo_color = Color(0.9, 0.1, 0.1, 1)
+
+[node name="FishingSpot" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 2.5, 4.5)
+fov = 65.0
+
+[node name="Water" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_water")
+surface_material_override/0 = SubResource("StandardMaterial3D_water")
+
+[node name="Boat" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 3)
+mesh = SubResource("BoxMesh_boat")
+surface_material_override/0 = SubResource("StandardMaterial3D_boat")
+
+[node name="Bobber" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -6)
+mesh = SubResource("SphereMesh_bobber")
+surface_material_override/0 = SubResource("StandardMaterial3D_bobber")
+
+[node name="UICanvas" type="CanvasLayer" parent="."]
+
+[node name="PromptLabel" type="Label" parent="UICanvas"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 40.0
+offset_right = 300.0
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_font_sizes/font_size = 20
+text = "마우스 클릭으로 찌를 캐스팅하세요."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FightPanel" type="Panel" parent="UICanvas"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -170.0
+offset_right = 250.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LabelTension" type="Label" parent="UICanvas/FightPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 15.0
+offset_right = 130.0
+offset_top = 40.0
+text = "라인 장력"
+
+[node name="TensionBar" type="ProgressBar" parent="UICanvas/FightPanel"]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 15.0
+offset_right = 470.0
+offset_top = 40.0
+value = 50.0
+
+[node name="LabelStamina" type="Label" parent="UICanvas/FightPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 55.0
+offset_right = 130.0
+offset_top = 80.0
+text = "물고기 힘"
+
+[node name="StaminaBar" type="ProgressBar" parent="UICanvas/FightPanel"]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 55.0
+offset_right = 470.0
+offset_top = 80.0
+value = 100.0
+
+[node name="DistanceLabel" type="Label" parent="UICanvas/FightPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 100.0
+offset_right = 470.0
+offset_top = 125.0
+theme_override_font_sizes/font_size = 18
+text = "거리: 50.0 m"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultPanel" type="Panel" parent="UICanvas"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultText" type="Label" parent="UICanvas/ResultPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "포획 성공!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmBtn" type="Button" parent="UICanvas/ResultPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -65.0
+offset_right = -40.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "확인"
+
+[node name="BackBtn" type="Button" parent="UICanvas"]
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 130.0
+offset_bottom = 70.0
+text = "◀ 나가기"

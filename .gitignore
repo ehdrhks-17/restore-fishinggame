@@ -1,0 +1,17 @@
+# Godot 4 editor cache
+.godot/
+
+# Godot compilation/export files
+*.translation
+*.exe
+*.zip
+
+# Mono/C# ignores
+.mono/
+data_*/
+mono_project/
+.vs/
+
+# OS metadata
+.DS_Store
+Thumbs.db
