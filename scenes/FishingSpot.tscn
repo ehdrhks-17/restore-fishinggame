@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c5s84syh2f7y3"]
+[gd_scene load_steps=18 format=3 uid="uid://c5s84syh2f7y3"]
 
 [ext_resource type="Script" path="res://scripts/FishingSpot.gd" id="1_script"]
 
@@ -30,6 +30,9 @@ size = Vector3(2.5, 0.4, 4)
 flat_shading = true
 albedo_color = Color(0.364706, 0.219608, 0.12549, 1)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_boat"]
+size = Vector3(2.5, 0.4, 4)
+
 [sub_resource type="SphereMesh" id="SphereMesh_bobber"]
 radius = 0.25
 height = 0.5
@@ -39,6 +42,38 @@ rings = 6
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bobber"]
 flat_shading = true
 albedo_color = Color(0.9, 0.1, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dock"]
+size = Vector3(4, 0.4, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dock"]
+flat_shading = true
+albedo_color = Color(0.4, 0.28, 0.18, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dock"]
+size = Vector3(4, 0.4, 8)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_portal"]
+top_radius = 2.0
+bottom_radius = 2.0
+height = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_portal"]
+transparency = 1
+albedo_color = Color(0.1, 0.6, 1.0, 0.45)
+emission_enabled = true
+emission = Color(0.15, 0.7, 1.0, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_portal"]
+radius = 2.0
+height = 2.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_horizontal"]
+size = Vector3(200, 10, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_vertical"]
+size = Vector3(1, 10, 200)
 
 [node name="FishingSpot" type="Node3D"]
 script = ExtResource("1_script")
@@ -58,41 +93,254 @@ fov = 65.0
 mesh = SubResource("PlaneMesh_water")
 surface_material_override/0 = SubResource("StandardMaterial3D_water")
 
-[node name="Boat" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 3)
+[node name="Boat" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 6)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Boat"]
 mesh = SubResource("BoxMesh_boat")
 surface_material_override/0 = SubResource("StandardMaterial3D_boat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Boat"]
+shape = SubResource("BoxShape3D_boat")
 
 [node name="Bobber" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -6)
 mesh = SubResource("SphereMesh_bobber")
 surface_material_override/0 = SubResource("StandardMaterial3D_bobber")
 
+[node name="Dock" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.2, 8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Dock"]
+mesh = SubResource("BoxMesh_dock")
+surface_material_override/0 = SubResource("StandardMaterial3D_dock")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dock"]
+shape = SubResource("BoxShape3D_dock")
+
+[node name="DockPortal" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.1, 8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DockPortal"]
+mesh = SubResource("CylinderMesh_portal")
+surface_material_override/0 = SubResource("StandardMaterial3D_portal")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DockPortal"]
+shape = SubResource("CylinderShape3D_portal")
+
+[node name="Boundaries" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape_North" type="CollisionShape3D" parent="Boundaries"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -100)
+shape = SubResource("BoxShape3D_wall_horizontal")
+
+[node name="CollisionShape_South" type="CollisionShape3D" parent="Boundaries"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 100)
+shape = SubResource("BoxShape3D_wall_horizontal")
+
+[node name="CollisionShape_West" type="CollisionShape3D" parent="Boundaries"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 5, 0)
+shape = SubResource("BoxShape3D_wall_vertical")
+
+[node name="CollisionShape_East" type="CollisionShape3D" parent="Boundaries"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 5, 0)
+shape = SubResource("BoxShape3D_wall_vertical")
+
 [node name="UICanvas" type="CanvasLayer" parent="."]
+
+[node name="TopLeftPanel" type="PanelContainer" parent="UICanvas"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 320.0
+offset_bottom = 110.0
+
+[node name="VBox" type="VBoxContainer" parent="UICanvas/TopLeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Location" type="Label" parent="UICanvas/TopLeftPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "❄️ 겨울  서울 ▶ 한강"
+
+[node name="Money" type="Label" parent="UICanvas/TopLeftPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "💰 0 쿠아"
+
+[node name="TopRightPanel" type="PanelContainer" parent="UICanvas"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -170.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 75.0
+grow_horizontal = 0
+
+[node name="ClockLabel" type="Label" parent="UICanvas/TopRightPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "⏰ 07:00"
+horizontal_alignment = 1
+
+[node name="BottomLeftPanel" type="PanelContainer" parent="UICanvas"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -240.0
+offset_right = 200.0
+offset_bottom = -20.0
+grow_vertical = 0
+
+[node name="VBox" type="VBoxContainer" parent="UICanvas/BottomLeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Btn1" type="Button" parent="UICanvas/BottomLeftPanel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "보트 교환"
+
+[node name="Btn2" type="Button" parent="UICanvas/BottomLeftPanel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "낚시하기"
+
+[node name="Btn3" type="Button" parent="UICanvas/BottomLeftPanel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "수조 보기"
+
+[node name="Btn4" type="Button" parent="UICanvas/BottomLeftPanel/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "도움말"
+
+[node name="BottomRightPanel" type="PanelContainer" parent="UICanvas"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -275.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBox" type="VBoxContainer" parent="UICanvas/BottomRightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="BoatingContainer" type="VBoxContainer" parent="UICanvas/BottomRightPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="MinimapContainer" type="AspectRatioContainer" parent="UICanvas/BottomRightPanel/VBox/BoatingContainer"]
+custom_minimum_size = Vector2(130, 130)
+layout_mode = 2
+
+[node name="SpeedLabel" type="Label" parent="UICanvas/BottomRightPanel/VBox/BoatingContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Speed: 000.0 km/h"
+horizontal_alignment = 1
+
+[node name="BtnOpenMap" type="Button" parent="UICanvas/BottomRightPanel/VBox/BoatingContainer"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "지도 열기"
+
+[node name="FishingContainer" type="VBoxContainer" parent="UICanvas/BottomRightPanel/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LureBox" type="PanelContainer" parent="UICanvas/BottomRightPanel/VBox/FishingContainer"]
+layout_mode = 2
+
+[node name="LureLabel" type="Label" parent="UICanvas/BottomRightPanel/VBox/FishingContainer/LureBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🪱 초보 루어"
+horizontal_alignment = 1
+
+[node name="RodBox" type="PanelContainer" parent="UICanvas/BottomRightPanel/VBox/FishingContainer"]
+layout_mode = 2
+
+[node name="RodLabel" type="Label" parent="UICanvas/BottomRightPanel/VBox/FishingContainer/RodBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🎣 초보 낚싯대"
+horizontal_alignment = 1
+
+[node name="CastMeterContainer" type="HBoxContainer" parent="UICanvas/BottomRightPanel/VBox/FishingContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="BtnClick" type="Button" parent="UICanvas/BottomRightPanel/VBox/FishingContainer/CastMeterContainer"]
+custom_minimum_size = Vector2(65, 55)
+layout_mode = 2
+text = "CLICK!"
+
+[node name="CastBarControl" type="Control" parent="UICanvas/BottomRightPanel/VBox/FishingContainer/CastMeterContainer"]
+custom_minimum_size = Vector2(130, 55)
+layout_mode = 2
+
+[node name="CastBar" type="ProgressBar" parent="UICanvas/BottomRightPanel/VBox/FishingContainer/CastMeterContainer/CastBarControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+value = 50.0
+show_percentage = false
+
+[node name="CastBarLabel" type="Label" parent="UICanvas/BottomRightPanel/VBox/FishingContainer/CastMeterContainer/CastBarControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 14
+text = "MIN  |  MAX"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="PromptLabel" type="Label" parent="UICanvas"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -300.0
-offset_top = 40.0
+offset_top = 130.0
 offset_right = 300.0
-offset_bottom = 90.0
+offset_bottom = 180.0
 grow_horizontal = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "마우스 클릭으로 찌를 캐스팅하세요."
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="FightPanel" type="Panel" parent="UICanvas"]
+visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -250.0
-offset_top = -170.0
+offset_top = -200.0
 offset_right = 250.0
 offset_bottom = -30.0
 grow_horizontal = 2
@@ -103,7 +351,7 @@ layout_mode = 0
 offset_left = 30.0
 offset_top = 15.0
 offset_right = 130.0
-offset_top = 40.0
+offset_bottom = 40.0
 text = "라인 장력"
 
 [node name="TensionBar" type="ProgressBar" parent="UICanvas/FightPanel"]
@@ -111,7 +359,7 @@ layout_mode = 0
 offset_left = 130.0
 offset_top = 15.0
 offset_right = 470.0
-offset_top = 40.0
+offset_bottom = 40.0
 value = 50.0
 
 [node name="LabelStamina" type="Label" parent="UICanvas/FightPanel"]
@@ -119,7 +367,7 @@ layout_mode = 0
 offset_left = 30.0
 offset_top = 55.0
 offset_right = 130.0
-offset_top = 80.0
+offset_bottom = 80.0
 text = "물고기 힘"
 
 [node name="StaminaBar" type="ProgressBar" parent="UICanvas/FightPanel"]
@@ -127,7 +375,7 @@ layout_mode = 0
 offset_left = 130.0
 offset_top = 55.0
 offset_right = 470.0
-offset_top = 80.0
+offset_bottom = 80.0
 value = 100.0
 
 [node name="DistanceLabel" type="Label" parent="UICanvas/FightPanel"]
@@ -135,22 +383,23 @@ layout_mode = 0
 offset_left = 30.0
 offset_top = 100.0
 offset_right = 470.0
-offset_top = 125.0
+offset_bottom = 125.0
 theme_override_font_sizes/font_size = 18
 text = "거리: 50.0 m"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ResultPanel" type="Panel" parent="UICanvas"]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -150.0
+offset_top = -180.0
 offset_right = 200.0
-offset_bottom = 150.0
+offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -184,9 +433,11 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "확인"
 
-[node name="BackBtn" type="Button" parent="UICanvas"]
-offset_left = 30.0
-offset_top = 30.0
-offset_right = 130.0
-offset_bottom = 70.0
-text = "◀ 나가기"
+[node name="Popups" type="Control" parent="UICanvas"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

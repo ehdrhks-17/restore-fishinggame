@@ -60,10 +60,11 @@ theme_override_font_sizes/font_size = 18
 text = "싱글플레이 (오프라인)"
 
 [node name="BtnMulti" type="Button" parent="VBoxContainer"]
+disabled = true
 custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "멀티플레이 (온라인)"
+text = "멀티플레이 (개발중)"
 
 [node name="BtnExit" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 45)

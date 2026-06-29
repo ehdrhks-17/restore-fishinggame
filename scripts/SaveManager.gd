@@ -20,6 +20,8 @@ func load_game() -> void:
 		await _load_from_server()
 	else:
 		_load_from_local()
+	# Automatically persist data migrations
+	save_game()
 
 # Local implementation (JSON-based)
 func _save_to_local(data: Dictionary) -> void:
